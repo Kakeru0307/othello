@@ -1,57 +1,114 @@
+import { useState } from 'react';
 import styles from './index.module.css';
-
+const nomalBoard: number[][] = [
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 2, 0, 0, 0],
+  [0, 0, 0, 2, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+];
+// [
+//   [0, 0, 0, 0, 0, 0, 0, 0],
+//   [0, 0, 0, 0, 0, 0, 0, 1],
+//   [0, 0, 0, 0, 0, 0, 2, 1],
+//   [0, 0, 0, 0, 0, 1, 2, 1],
+//   [0, 0, 0, 0, 2, 1, 2, 1],
+//   [0, 0, 0, 1, 2, 1, 2, 1],
+//   [0, 0, 2, 1, 2, 1, 2, 1],
+//   [0, 2, 1, 2, 1, 2, 1, 2],
+// ];
+// [
+//   [0, 0, 0, 0, 0, 0, 0, 0],
+//   [2, 2, 1, 2, 1, 2, 1, 0],
+//   [1, 1, 2, 1, 2, 1, 2, 0],
+//   [2, 2, 1, 2, 1, 2, 1, 0],
+//   [1, 1, 2, 1, 2, 1, 2, 0],
+//   [2, 2, 1, 2, 1, 2, 1, 0],
+//   [1, 1, 2, 1, 2, 1, 2, 0],
+//   [2, 1, 2, 1, 2, 1, 2, 0],
+// ];
+//[
+// [0, 0, 0, 0, 0, 0, 0, 0],
+// [1, 1, 1, 1, 1, 1, 1, 0],
+// [1, 2, 2, 2, 2, 2, 1, 0],
+// [1, 2, 2, 2, 2, 2, 1, 0],
+// [1, 2, 2, 0, 2, 2, 1, 0],
+// [1, 2, 2, 2, 2, 2, 1, 0],
+// [1, 2, 2, 2, 2, 2, 1, 0],
+// [1, 1, 1, 1, 1, 1, 1, 0],
+//];
+const directions = [
+  [-1, -1],
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+];
 const Home = () => {
+  const [board, setBoard] = useState(nomalBoard);
+  const newBoard: number[][] = JSON.parse(JSON.stringify(board));
+  const [turn, setTurn] = useState(1);
+  const clickCell = (x: number, y: number) => {
+    let isPassOnAnotherColor = false;
+    for (const direction of directions) {
+      for (let distance = 1; distance < 8; distance++) {
+        if (
+          newBoard[y + distance * direction[0]] === undefined ||
+          newBoard[y + distance * direction[0]][x + distance * direction[1]] === undefined
+        ) {
+          break;
+        } else if (newBoard[y][x] === turn) {
+          break;
+        } else if (newBoard[y][x] === 3 - turn) {
+          break;
+        } else if (newBoard[y + distance * direction[0]][x + distance * direction[1]] === 0) {
+          break;
+        } else if (
+          newBoard[y + distance * direction[0]][x + distance * direction[1]] ===
+          3 - turn
+        ) {
+          isPassOnAnotherColor = true;
+          continue;
+        } else if (newBoard[y + distance * direction[0]][x + distance * direction[1]] === turn) {
+          if (isPassOnAnotherColor) {
+            for (let back = 1; back <= distance; back++) {
+              newBoard[y + (distance - back) * direction[0]][x + (distance - back) * direction[1]] =
+                turn;
+              newBoard[y][x] = turn;
+              setTurn(3 - turn);
+              break;
+            }
+          } else {
+            break;
+          }
+        }
+      }
+    }
+    console.log(turn);
+    setBoard(newBoard);
+  };
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code} style={{ backgroundColor: '#fafafa' }}>
-            pages/index.js
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/learn">
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a className={styles.card} href="https://github.com/vercel/next.js/tree/master/examples">
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <div className={styles.board}>
+        {board.map((row, y) =>
+          row.map((color, x) => (
+            <div className={styles.cell} key={`${y}-${x}`} onClick={() => clickCell(x, y)}>
+              {color !== 0 && (
+                <div
+                  className={styles.stone}
+                  style={{ backgroundColor: color === 1 ? '#000' : '#fff' }}
+                />
+              )}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };
